@@ -5,6 +5,8 @@ using EzySlice;
 
 public class Slice : MonoBehaviour
 {
+    PlatformManager platformManager;
+
     const string strPlatform = "Platform";
 
     public Transform cutPlane;
@@ -27,6 +29,7 @@ public class Slice : MonoBehaviour
 
     private void Start() 
     {
+        platformManager = PlatformManager.Instance;
         platformLayer = LayerMask.NameToLayer(strPlatform);    
 
         waitForSeconds = new WaitForSeconds(3);
@@ -34,6 +37,16 @@ public class Slice : MonoBehaviour
 
     private void Update() 
     {
+        RaycastHit hit;
+
+        if (sliceDirection == SliceDirection.right)
+        {
+            if (Physics.Raycast(transform.position, transform.TransformDirection(Vector3.right), out hit, Mathf.Infinity, layerMask))
+            {
+                gameObject.transform.position = hit.point;
+            }
+        }
+
         if (Input.GetMouseButtonDown(0))
         {
             Slicer();
@@ -58,23 +71,32 @@ public class Slice : MonoBehaviour
                 if (sliceDirection == SliceDirection.right)
                 {
                     top.layer = platformLayer;
-                    PlatformManager.Instance.lastPlatformGo = top;
+                    platformManager.lastPlatformGo.layer = 0;
+                    platformManager.lastPlatformGo = top;
                     AddHullComponents(bottom);
                     AddHullWithOutRigidboyd(top);
                     StartCoroutine(FallObjectsClose(bottom));
+                    platformManager.PlatformSpawn();
                 }
 
                 if (sliceDirection == SliceDirection.left)
                 {
                     bottom.layer = platformLayer;
-                    PlatformManager.Instance.lastPlatformGo = bottom;
+                    platformManager.lastPlatformGo.layer = 0;
+                    platformManager.lastPlatformGo = bottom;
                     AddHullComponents(top);
                     AddHullWithOutRigidboyd(bottom);
                     StartCoroutine(FallObjectsClose(top));
+                    platformManager.PlatformSpawn();
                 }
 
                 hits[i].gameObject.SetActive(false);
                 //Destroy(hits[i].gameObject);
+            }
+            else
+            {
+                //TODO: Doğru yerleştirildi. Ses ve kombo eklenecek
+                Debug.Log("Kombo");
             }
         }
     }
@@ -100,7 +122,7 @@ public class Slice : MonoBehaviour
         if (obj.GetComponent<MeshFilter>() == null)
             return null;
 
-        return obj.Slice(cutPlane.position, cutPlane.up, crossSectionMaterial);
+        return obj.Slice(cutPlane.position, cutPlane.right, crossSectionMaterial);
     }
 
     IEnumerator FallObjectsClose(GameObject go)

@@ -33,6 +33,7 @@ public class PlatformManager : Singleton<PlatformManager>
 
     private void Start() 
     {
+        
         platformScale = platformPrefab.transform.localScale;    
 
         PlatformSpawn();
@@ -40,10 +41,7 @@ public class PlatformManager : Singleton<PlatformManager>
 
     private void Update() 
     {
-        if (Input.GetMouseButtonDown(0))
-        {
-            PlatformSpawn();
-        }    
+        
     }    
 
     public void PlatformSpawn()
@@ -53,10 +51,9 @@ public class PlatformManager : Singleton<PlatformManager>
         platformSpawnTransform.position = new Vector3(lastPlatformGo.transform.position.x + (platformScale.x * rnd), lastPlatformGo.transform.position.y , lastPlatformGo.transform.position.z + platformScale.z);
 
         GameObject platformGo = Instantiate(lastPlatformGo, platformSpawnTransform.position, Quaternion.identity, transform);
-        
+
         MovePlatform(platformGo, rnd);
         ChangePlatformColor(platformGo);
-
         SlicerPositionUpdate(lastPlatformGo);
     }
 
@@ -93,8 +90,8 @@ public class PlatformManager : Singleton<PlatformManager>
     public void SlicerPositionUpdate(GameObject platformGo)
     {
         Vector3 scale = lastPlatformGo.transform.localScale;
-        
-        rightSlicer.transform.position = new Vector3((scale.x / 2), platformGo.transform.position.y, platformGo.transform.position.z);
-        leftSlicer.transform.position = new Vector3((-scale.x / 2), platformGo.transform.position.y, platformGo.transform.position.z);
+
+        rightSlicer.transform.position = new Vector3((scale.x / 2) + .25f, platformGo.transform.position.y, platformGo.transform.position.z + 1);
+        leftSlicer.transform.position = new Vector3((-scale.x / 2) - .25f, platformGo.transform.position.y, platformGo.transform.position.z + 1);
     }
 }
